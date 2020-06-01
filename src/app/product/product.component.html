@@ -1,0 +1,11 @@
+<div style="cursor: pointer;" (click)="goToDetailsPane($event)" class="box object">
+  <div class="frame">
+    <div class="price">{{product.price}} zł</div>
+    <img *ngIf="photos !== undefined && photos.length > 0" src="data:image/jpeg;base64,{{photos[0]}}" alt="zdjęcie">
+  </div>
+  <div class="productName">{{product.name}}</div>
+  <div class="description">{{product.description}}</div>
+</div>
+<p-sidebar [blockScroll]="true" [style]="{width:'90%', left:'5%', top:'5%', height: '90%'}" position="bottom" [(visible)]="display">
+  <app-product-details [product]="product" [photos]="photos"></app-product-details>
+</p-sidebar>

@@ -1,0 +1,63 @@
+<div class="container">
+  <div class="ui-inputgroup parameter">
+      <span class="ui-inputgroup-addon">Nazwa produktu</span>
+      <input [(ngModel)]="productName" type="text" pInputText>
+  </div>
+
+  <div class="parameter">
+    <span>Kategoria:</span>
+      <p-tree [filter]="true" [value]="categoriesTree" selectionMode="single" [(selection)]="selectedCategory" (onNodeExpand)="addInputNodes($event)" (onNodeCollapse)="removeInputNodes($event)">
+        <ng-template let-node pTemplate="default">
+          <input *ngIf="node.styleClass === 'inputNode'" [(ngModel)]="node.label" type="text" class="ui-inputtext">
+          <label *ngIf="node.styleClass === undefined">{{node.label}}</label>
+        </ng-template>
+      </p-tree>
+  </div>
+
+  <div class="ui-inputgroup parameter">
+    <span class="ui-inputgroup-addon">Cena</span>
+    <input [(ngModel)]="price" type="text" pInputText style="width: 77%;">
+    <span class="ui-inputgroup-addon" style="width: 20%;">zł</span>
+  </div>
+
+  <div class="ui-inputgroup parameter">
+    <span class="ui-inputgroup-addon">Krótki opis produktu (pozostało {{ 150 - (shortDescription !== undefined ? shortDescription.length : 0)}} znaków)</span>
+    <textarea [(ngModel)]="shortDescription" [maxLength]="150" rows="3" cols="30" pInputTextarea autoResize="autoResize"></textarea>
+  </div>
+
+  <div class="ui-inputgroup parameter">
+    <span class="ui-inputgroup-addon">Opis produktu</span>
+    <textarea [(ngModel)]="description" rows="3" cols="30" pInputTextarea autoResize="autoResize"></textarea>
+  </div>
+
+  <div class="ui-inputgroup parameter">
+    <span class="ui-inputgroup-addon">Wymiary</span>
+    <input [(ngModel)]="dimensions" type="text" pInputText>
+  </div>
+
+  <div class="ui-inputgroup parameter">
+    <span class="ui-inputgroup-addon">Waga</span>
+    <input [(ngModel)]="weight" type="text" pInputText>
+  </div>
+
+  <div class="ui-inputgroup parameter">
+    <span class="ui-inputgroup-addon">Jednostka</span>
+    <input [(ngModel)]="unit" type="text" pInputText>
+  </div>
+
+  <div class="ui-inputgroup parameter">
+    <span class="ui-inputgroup-addon">Ilość dostępna w magazynie</span>
+    <input [(ngModel)]="itemsNumber" type="text" pInputText>
+  </div>
+
+  <div class="parameter">
+      <p-fileUpload #fileUpload [customUpload]="true" [showUploadButton]="false"
+                    multiple="multiple" accept="image/*" maxFileSize="16000000" chooseLabel="Wybierz pliki" cancelLabel="Anuluj">
+      </p-fileUpload>
+  </div>
+
+
+  <div class="parameter">
+    <p-button icon="pi pi-check" label="Dodaj produkt" (onClick)="uploadProduct($event)"></p-button>
+  </div>
+</div>

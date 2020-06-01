@@ -1,0 +1,32 @@
+.parameter {
+  margin-bottom: 10px;
+}
+
+.parameter * {
+  display: grid;
+  width: 100%;
+}
+
+.inputNode{
+  width: 100%;
+  height: 100%;
+}
+
+@media screen and (min-width: 1024px){
+  .parameter {
+    width: 65%;
+  }
+}
+
+@media screen and (min-width: 768px) and (max-width: 1023px){
+  .parameter {
+    width: 90%
+  }
+}
+
+@media screen and (max-width: 767px) {
+  .parameter {
+    width: 100%
+  }
+}
+

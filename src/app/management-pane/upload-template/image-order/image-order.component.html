@@ -1,0 +1,7 @@
+<p-orderList [value]="photos" dragdrop="true">
+  <ng-template let-photo pTemplate="item">
+    <div class="ui-helper-clearfix">
+      <img src="data:image/jpeg;base64,{{photo}}" style="display:inline-block;margin:2px 0 2px 2px" width="60">
+    </div>
+  </ng-template>
+</p-orderList>

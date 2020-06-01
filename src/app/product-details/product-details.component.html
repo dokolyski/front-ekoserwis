@@ -1,0 +1,6 @@
+<div class="frame">
+  <div class="price">{{product.price}} zł</div>
+  <img *ngIf="photos !== undefined && photos.length > 0" class src="data:image/jpeg;base64,{{photos[0]}}" alt="zdjęcie">
+</div>
+<div class="productName">{{product.name}}</div>
+<div class="description">{{product.description}}</div>

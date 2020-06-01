@@ -1,0 +1,47 @@
+.box {
+  text-align: center;
+  padding: 5%;
+  -webkit-box-shadow: 0 8px 6px -6px black;
+  -moz-box-shadow: 0 8px 6px -6px black;
+  box-shadow: 0 8px 6px -6px black;
+}
+
+.frame {
+  display: block;
+  position: relative;
+}
+
+img {
+  border-radius: 10px;
+}
+
+.productName {
+  font-weight: bold;
+}
+
+.description {
+  font-weight: lighter;
+}
+
+.price {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #921b16;
+  border-radius: 10px;
+  width: auto;
+  padding: 1% 2% 1% 2%;
+  height: 15%;
+  right: -3%;
+  top: -3%;
+  position: absolute;
+  color: white;
+  font-weight: 600;
+  font-family: "Source Sans Pro", sans-serif;
+}
+
+.ui-sidebar {
+  width: 80%;
+}
+
+/*# sourceMappingURL=product.component.css.map */
