@@ -31,10 +31,9 @@ img {
   background-color: #921b16;
   border-radius: 10px;
 
-  //width:  25%;
   width: auto;
-  padding: 1% 2% 1% 2%;
-  height: 15%;
+  padding: 0 2% 0 2%;
+  height: auto;
   right: -3%;
   top: -3%;
 
@@ -43,8 +42,4 @@ img {
   color: white;
   font-weight: 600;
   font-family: 'Source Sans Pro', sans-serif;
-}
-
-.ui-sidebar {
-  width: 80%;
 }

@@ -31,9 +31,12 @@ export class NavbarComponent implements OnInit {
 
     this.items = [
       this.productsItem,
-      {label: 'Moje zakupy', routerLink: ['myShopping']},
       {label: 'Kontakt', routerLink: ['contact']},
-      {label: 'Zarządzaj asortymentem', routerLink: ['management']}
+      {separator: true},
+      {label: 'Zarządzaj asortymentem', routerLink: ['management']},
+      {separator: true},
+      {label: 'Mój profil', icon: 'pi pi-user', routerLink: ['profile']},
+      {label: 'Koszyk', icon: 'pi pi-shopping-cart', styleClass: 'cardIcon', routerLink: ['shoppingCard']}
     ];
   }
 

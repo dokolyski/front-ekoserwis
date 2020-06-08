@@ -18,7 +18,7 @@ export class UploadProductService {
       return this.http.post('/categories/add', formData, { responseType: 'text'}).toPromise();
   }
 
-  getFileID(file: File): Observable<string> {
+  uploadPhoto(file: File): Observable<string> {
     return new Observable<string>(subscriber => {
       const formData: FormData = new FormData();
       formData.append('file', file);
@@ -32,9 +32,20 @@ export class UploadProductService {
     });
   }
 
-  uploadProduct(product: Product): Observable<string>  {
+  uploadProduct(product: Product): Observable<Product>  {
+    return new Observable<Product>(subscriber => {
+      this.http.post('/products/add', product).subscribe((data: Product) => {
+        subscriber.next(data);
+      }, error => {
+        this.toastService.error(error);
+      });
+    });
+  }
+
+  // todo test it!
+  actualizeProduct(product: Product): Observable<string>  {
     return new Observable<any>(subscriber => {
-      this.http.post('/products/add', product, { responseType: 'text'}).subscribe(data => {
+      this.http.put('/products/set', product, { responseType: 'text'}).subscribe(data => {
         subscriber.next(data);
       }, error => {
         this.toastService.error(error);

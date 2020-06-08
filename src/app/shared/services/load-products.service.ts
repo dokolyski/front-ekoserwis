@@ -3,15 +3,16 @@ import { HttpClient } from '@angular/common/http';
 import {Observable} from 'rxjs';
 import {Product} from '../models/Product';
 import {Page} from '../models/Page';
+import {UserService} from './user.service';
 @Injectable({
   providedIn: 'root'})
 export class LoadProductsService {
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private userService: UserService) { }
 
   getProducts(params?): Observable<Page<Product>> {
     return new Observable<Page<Product>>(subscriber => {
-      this.http.get('/products/get', {params}).subscribe((data: Page<Product>) => {
+      this.http.get('/products/get', {params, headers: {Authorization: this.userService.getJWT()}}).subscribe((data: Page<Product>) => {
         subscriber.next(data);
       });
     });

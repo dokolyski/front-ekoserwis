@@ -61,3 +61,7 @@
     <p-button icon="pi pi-check" label="Dodaj produkt" (onClick)="uploadProduct($event)"></p-button>
   </div>
 </div>
+
+<p-sidebar [dismissible]="false" [showCloseIcon]="false" [blockScroll]="true" [style]="{width:'90%', left:'5%', top:'5%', height: '90%'}" position="bottom" [(visible)]="displayImagesOrder">
+  <app-image-order [product]="product" (end)="orderChanged()"></app-image-order>
+</p-sidebar>

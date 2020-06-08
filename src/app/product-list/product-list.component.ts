@@ -11,6 +11,7 @@ import {Paginator, SelectItem} from 'primeng';
   styleUrls: ['./product-list.component.scss']
 })
 export class ProductListComponent implements OnInit {
+  private category: string;
   @ViewChildren(Paginator) paginators: any;
   products: Product[];
   rangeValues: number[] = [undefined, undefined];
@@ -33,12 +34,10 @@ export class ProductListComponent implements OnInit {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         const url: string[] = event.url.split('/'); // todo filters
-        const category: string = url.length > 2 ? url[2] : undefined;
-        if (category !== undefined) {
-          console.log(category);
-          loadProductsService.getProducts({category, productsPerPage: this.rowNumber}).subscribe(next => {
-            this.products = next.content;
-          });
+        this.category = url.length > 2 ? url[2] : undefined;
+        if (this.category !== undefined) {
+          console.log(this.category);
+          this.loadProducts({category: this.category, productsPerPage: this.rowNumber});
         }
       }
     });
@@ -70,6 +69,7 @@ export class ProductListComponent implements OnInit {
   }
 
   changePage(event: any) {
+    this.loadProducts({pageNumber: event.page, category: this.category, productsPerPage: this.rowNumber});
     for (const paginator of (this.paginators._results as Paginator[])) {
       paginator.rows = event.rows;
       if (paginator.getPage() !== event.page) {

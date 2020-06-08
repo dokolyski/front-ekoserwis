@@ -1,6 +1,26 @@
-<div class="frame">
+<p-scrollPanel [style]="{width: '100%', height: 'calc(100% - 18px)'}">
+  <p-galleria #galleria [value]="photos" [(activeIndex)]="activeIndex" [numVisible]="5" [containerStyle]="{'max-width':'640px'}" [containerClass]="galleriaClass()" [showThumbnails]="showThumbnails"
+              [showItemNavigators]="true" [showItemNavigatorsOnHover]="true" [circular]="true">
+    <ng-template pTemplate="item" let-item>
+      <img src="data:image/jpeg;base64,{{item}}" [ngStyle]="{'width': !fullscreen ? '100%' : '', 'display': !fullscreen ? 'block' : ''}" />
+    </ng-template>
+    <ng-template pTemplate="thumbnail" let-item>
+      <div class="p-grid p-nogutter p-justify-center">
+        <img src="data:image/jpeg;base64,{{item}}" />
+      </div>
+    </ng-template>
+    <ng-template pTemplate="footer" let-item>
+      <div class="custom-galleria-footer">
+        <button pButton icon="pi pi-list" (click)="onThumbnailButtonClick()"></button>
+        <span *ngIf="photos"  class="title-container">
+            <span>{{activeIndex + 1}}/{{photos.length}}</span>
+        </span>
+        <button pButton [icon]="fullScreenIcon()" (click)="toggleFullScreen()" class="fullscreen-button"></button>
+      </div>
+    </ng-template>
+  </p-galleria>
+
   <div class="price">{{product.price}} zł</div>
-  <img *ngIf="photos !== undefined && photos.length > 0" class src="data:image/jpeg;base64,{{photos[0]}}" alt="zdjęcie">
-</div>
 <div class="productName">{{product.name}}</div>
 <div class="description">{{product.description}}</div>
+</p-scrollPanel>

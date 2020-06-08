@@ -1,0 +1,15 @@
+::ng-deep p-scrollPanel .ui-scrollpanel-bar-y {
+  visibility: hidden;
+}
+
+::ng-deep p-galleria .ui-galleria-item-container{
+  width: 500px;
+}
+
+::ng-deep p-galleria .ui-galleria-thumbnail-container{
+  width: 500px;
+}
+
+::ng-deep p-galleria .ui-galleria-thumbnail-item {
+  margin: 3px;
+}

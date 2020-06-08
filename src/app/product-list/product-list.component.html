@@ -34,8 +34,8 @@
     <p-paginator (onPageChange)="changePage($event)" [rows]="rowNumber" [totalRecords]="totalRecords" [rowsPerPageOptions]="[12,24,48]"></p-paginator>
   </div>
 
-  <div class="p-grid">
-    <div class="p-col-10 p-offset-1 p-md-offset-0 p-md-6 p-lg-4 p-xl-3 container" *ngFor="let product of products">
+  <div class="p-grid products">
+    <div class="p-col-12 p-md-6 p-lg-4 p-xl-3 container" *ngFor="let product of products">
       <app-product class="element" [product]="product" (initEvent)="onResize()"></app-product>
     </div>
   </div>

@@ -7,7 +7,6 @@ import {Observable} from 'rxjs';
 import {Category} from '../../shared/models/Category';
 import {Product} from '../../shared/models/Product';
 import {MenuItem} from 'primeng/api';
-import {NodeEventHandler} from 'rxjs/internal/observable/fromEvent';
 
 @Component({
   selector: 'app-upload-template',
@@ -27,6 +26,9 @@ export class UploadTemplateComponent implements OnInit {
   description: string;
   dimensions: string;
   weight: string;
+  displayImagesOrder = false;
+  photosIDs: string[] = [];
+  product: Product;
 
   // tslint:disable-next-line:max-line-length
   constructor(private toastService: ToastService, private uploadService: UploadProductService, private categoriesService: CategoriesService) {}
@@ -134,14 +136,14 @@ export class UploadTemplateComponent implements OnInit {
     if (this.checkDataCorrectness()) {
       const categoriesPromise = this.uploadCategories(this.selectedCategory).then(next => {
         const categoryID = next;
-        const photosIDs: string[] = [];
+        this.photosIDs = [];
         // tslint:disable-next-line:max-line-length
         const completedProduct = new Product(this.productName, parseFloat(this.price), this.description, [], parseFloat(this.itemsNumber), this.dimensions, this.weight, categoryID);
         if (this.fileUpload._files.length > 0) {
-          this.uploadAllPhotos().subscribe(newID => photosIDs.push(newID),
+          this.uploadAllPhotos().subscribe(newID => this.photosIDs.push(newID),
             () => {},
             () => {
-              completedProduct.images = photosIDs;
+              completedProduct.images = this.photosIDs;
               this.uploadWholeProduct(completedProduct);
             });
         } else {
@@ -153,14 +155,20 @@ export class UploadTemplateComponent implements OnInit {
   }
 
   private uploadWholeProduct(product: Product): void {
-    this.uploadService.uploadProduct(product).subscribe(() => this.toastService.success('Zapisano'));
+    this.uploadService.uploadProduct(product).subscribe(next => {
+      this.toastService.success('Zapisano');
+      if (next.images !== undefined) {
+        this.product = next;
+        this.displayImagesOrder = true;
+      }
+    });
   }
 
   private uploadAllPhotos(): Observable<string> {
     return new Observable<string>( observer => {
       let i = 0;
       for (const file of this.fileUpload._files) {
-        this.uploadService.getFileID(file).subscribe( next => {
+        this.uploadService.uploadPhoto(file).subscribe( next => {
           observer.next(next);
           i += 1;
           if (i === this.fileUpload._files.length) {
@@ -203,4 +211,8 @@ export class UploadTemplateComponent implements OnInit {
     return true;
   }
 
+  orderChanged() {
+    this.displayImagesOrder = false;
+    // todo przejdź do listy produktów
+  }
 }
