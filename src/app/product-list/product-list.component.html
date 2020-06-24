@@ -1,46 +1,63 @@
-<div class="whole-list">
+<div class="whole-pane">
   <div class="top-settings object">
     <div class="p-grid"  style="text-align: center">
-      <div class="p-col-12 p-md-5">
+      <div class="p-col-12 p-md-8">
         <div class="p-grid">
-          <div class="p-col-12 p-xl-5">
-            <span class="ui-float-label">
-              <input id="float-input" type="text" pInputText style="width: 100%">
-              <label for="float-input">Szukaj po nazwie:</label>
-            </span>
+          <div class="p-col-12 p-md-9">
+            <div class="p-grid">
+              <div class="p-col-12">
+                <span class="ui-float-label">
+                  <input (focusout)="changeName($event)" id="float-input" type="text" pInputText style="width: 100%">
+                  <label for="float-input">Szukaj po nazwie:</label>
+                </span>
+              </div>
+              <div class="p-col-12">
+                Cena od
+                <p-inputNumber class="price-input" [useGrouping]="false" [(ngModel)]="rangeValues[0]" mode="decimal"></p-inputNumber>
+                do
+                <p-inputNumber class="price-input" [useGrouping]="false" [(ngModel)]="rangeValues[1]" mode="decimal"></p-inputNumber>
+              </div>
+            </div>
           </div>
-          <div class="p-col-12 p-xl-7">
-            Cena od
-            <p-inputNumber class="price-input" [useGrouping]="false" [(ngModel)]="rangeValues[0]" mode="decimal"></p-inputNumber>
-            do
-            <p-inputNumber class="price-input" [useGrouping]="false" [(ngModel)]="rangeValues[1]" mode="decimal"></p-inputNumber>
+          <div style="display: block;" class="p-col-12 p-md-3">
+            <button (click)="applySortOrFilter()" class="filter-button ui-button-rounded" pButton type="button" label="Filtruj"></button>
           </div>
         </div>
       </div>
       <div class="p-col-12 p-md-4">
         <div class="p-grid">
-          <div class="p-col-12 p-xl-5">
-            <button pButton type="button" label="Powrót do ..." class="ui-button-rounded"></button>
+          <div *ngIf="subcategories && subcategories.length" class="p-col-12">
+            <p-dropdown [routerLink]="selectedSubcategory" [style]="{width: '100%'}" [options]="subcategories" [(ngModel)]="selectedSubcategory" placeholder="Wybierz podkategorię" [showClear]="true"></p-dropdown>
           </div>
-          <div class="p-col-12 p-xl-7">
-            <p-dropdown autoWidth="false" [style]="{width: '100%'}" [options]="subcategories" [(ngModel)]="selectedSubcategory" placeholder="Wybierz podkategorię" [showClear]="true"></p-dropdown>
+          <div *ngIf="parentCategory" class="p-col-12">
+            <button [routerLink]="parentCategory.id" pButton type="button" label="Powrót do {{parentCategory.name}}" class="ui-button-rounded"></button>
           </div>
         </div>
       </div>
-      <div class="p-col-12 p-md-3">
-        <p-dropdown autoWidth="false" [style]="{width: '100%'}" [options]="sortingOptions" [(ngModel)]="sortSelected" placeholder="Sortuj według" [showClear]="true"></p-dropdown>
-      </div>
     </div>
-    <p-paginator (onPageChange)="changePage($event)" [rows]="rowNumber" [totalRecords]="totalRecords" [rowsPerPageOptions]="[12,24,48]"></p-paginator>
+    <p-paginator [templateRight]="ref" (onPageChange)="changePage($event)" [rows]="12" [totalRecords]="totalRecords" [rowsPerPageOptions]="[12,24,48]">
+      <ng-template #ref pTemplate="tempR">
+        <p-dropdown [(ngModel)]="sortSelected" (ngModelChange)="applySortOrFilter()" [options]="sortingOptions" placeholder="Sortuj według" [showClear]="true"></p-dropdown>
+      </ng-template>
+    </p-paginator>
   </div>
 
-  <div class="p-grid products">
-    <div class="p-col-12 p-md-6 p-lg-4 p-xl-3 container" *ngFor="let product of products">
-      <app-product class="element" [product]="product" (initEvent)="onResize()"></app-product>
+  <div *ngIf="products.length > 0" class="p-grid products">
+    <div class="p-col-12 p-sm-8 p-sm-offset-2 p-md-6 p-md-offset-0 p-lg-4 p-xl-3 container" *ngFor="let product of products">
+      <app-product class="element" [product]="product" (showDetails)="showDetails($event)" (initEvent)="onResize()"></app-product>
     </div>
   </div>
-  <div *ngIf="products.length > 0" class="bottom-settings object">
-    <p-paginator (onPageChange)="changePage($event)" [rows]="rowNumber" [totalRecords]="totalRecords" [rowsPerPageOptions]="[12,24,48]"></p-paginator>
+  <div *ngIf="products.length === 0" style="margin: 30px">
+  </div>
+  <div class="bottom-settings object">
+    <p-paginator [templateRight]="ref" (onPageChange)="changePage($event)" [rows]="12" [totalRecords]="totalRecords" [rowsPerPageOptions]="[12,24,48]">
+      <ng-template #ref pTemplate="tempR">
+        <p-dropdown [(ngModel)]="sortSelected" (ngModelChange)="applySortOrFilter()" [options]="sortingOptions" placeholder="Sortuj według" [showClear]="true"></p-dropdown>
+      </ng-template>
+    </p-paginator>
   </div>
 </div>
+<p-sidebar [(visible)]="displayDetails" [blockScroll]="true" [style]="{width:'90%', left:'5%', top:'5%', height: '90%', borderRadius: '10px', backgroundColor: 'antiquewhite'}" position="bottom">
+  <app-product-details [product]="productToDetails"></app-product-details>
+</p-sidebar>
 

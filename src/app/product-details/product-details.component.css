@@ -1,17 +1,125 @@
-::ng-deep p-scrollPanel .ui-scrollpanel-bar-y {
+.gallery-series {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(128, 128, 128, 0.5);
+  border-radius: 0 10px 0 10px;
+  width: auto;
+  padding: 4px 6px 4px 6px;
+  height: auto;
+  right: 0;
+  top: 0;
+  position: absolute;
+  color: white;
+  font-weight: 600;
+  font-family: "Source Sans Pro", sans-serif;
+  font-size: 30px;
+}
+
+.big-image {
+  border-radius: 10px;
+  width: 100%;
+}
+
+.frame {
+  position: relative;
+}
+
+.price-details {
+  font-weight: 600;
+  font-size: 25px;
+}
+
+.productName-details {
+  font-weight: 500;
+  font-size: 30px;
+  font-family: serif;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.shortDescription-details {
+  text-align: center;
+  font-size: 14px;
+  margin: 15px 15px 5px 15px;
+}
+
+.fullDescription-details {
+  font-size: 15px;
+  text-align: justify;
+  text-justify: inter-word;
+}
+
+.description-details:after {
+  content: "";
+  display: block;
+  height: 15px;
+  width: 100%;
+}
+
+::ng-deep .ui-scrollpanel-bar {
   visibility: hidden;
 }
 
-::ng-deep p-galleria .ui-galleria-item-container {
-  width: 500px;
+.gallery {
+  text-align: center;
+  border-radius: 10px;
+  border-style: solid;
+  border-width: 3px;
+  border-color: grey;
+  background-color: grey;
+  margin: 0 0 0 10px;
 }
 
-::ng-deep p-galleria .ui-galleria-thumbnail-container {
-  width: 500px;
+.short_info {
+  text-align: center;
 }
 
-::ng-deep p-galleria .ui-galleria-thumbnail-item {
-  margin: 3px;
+@media only screen and (min-width: 1200px) {
+  .gallery {
+    width: calc(45% - 20px);
+  }
+
+  .short_info {
+    width: calc(55%);
+  }
+}
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+  .gallery {
+    width: calc(55% - 20px);
+  }
+
+  .short_info {
+    width: calc(45%);
+  }
+}
+@media only screen and (min-width: 768px) and (max-width: 991px) {
+  .gallery {
+    width: calc(60% - 20px);
+  }
+
+  .short_info {
+    width: calc(40%);
+  }
+}
+@media only screen and (min-width: 576px) and (max-width: 767px) {
+  .gallery {
+    width: calc(80%);
+    margin-left: calc(10%);
+  }
+
+  .short_info {
+    width: calc(100%);
+  }
+}
+@media only screen and (max-width: 575px) {
+  .gallery {
+    width: calc(100% - 20px);
+  }
+
+  .short_info {
+    width: calc(100%);
+  }
 }
 
 /*# sourceMappingURL=product-details.component.css.map */

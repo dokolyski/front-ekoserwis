@@ -4,6 +4,9 @@ import {NavigationEnd, Router} from '@angular/router';
 import {LoadProductsService} from '../shared/services/load-products.service';
 import * as $ from 'jquery';
 import {Paginator, SelectItem} from 'primeng';
+import {CategoriesService} from '../shared/services/categories.service';
+import {Category} from '../shared/models/Category';
+import {Subscription} from 'rxjs';
 
 @Component({
   selector: 'app-product-list',
@@ -14,36 +17,80 @@ export class ProductListComponent implements OnInit {
   private category: string;
   @ViewChildren(Paginator) paginators: any;
   products: Product[];
+  nameFilter: string;
   rangeValues: number[] = [undefined, undefined];
-  subcategories: string[];
+  subcategories: SelectItem[];
   selectedSubcategory: string;
-  rowNumber = 12;
   totalRecords = 0;
   sortingOptions: SelectItem[] = [
-    {label: 'najczęściej kupowane', value: 'BS'}, // best seller
     {label: 'cena rosnąco', value: 'PA'}, // price asc
     {label: 'cena malejąco', value: 'PD'}, // price desc
     {label: 'nazwa a-z', value: 'NA'}, // name asc
     {label: 'nazwa z-a', value: 'ND'}, // name desc
-    {label: 'ilość w magazynie', value: 'AD'}, // available number asc
+    {label: 'ilość w magazynie', value: 'AD'}, // available number desc
   ];
   sortSelected: string;
+  displayDetails = false;
+  productToDetails: Product;
+  photoToDetails: any;
+  parentCategory: Category;
 
-  constructor(private router: Router, private loadProductsService: LoadProductsService) {
+  private recursive = false;
+  private page: number;
+  private rows: number;
+
+  constructor(private router: Router, private loadProductsService: LoadProductsService, private categoriesService: CategoriesService) {
     this.products = [];
-    this.router.events.subscribe((event) => {
+    const subscription: Subscription = this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        const url: string[] = event.url.split('/'); // todo filters
-        this.category = url.length > 2 ? url[2] : undefined;
-        if (this.category !== undefined) {
-          console.log(this.category);
-          this.loadProducts({category: this.category, productsPerPage: this.rowNumber});
+        this.selectedSubcategory = undefined;
+        const url: string[] = event.url.split('/');
+        if (url.length >= 2 && url[1] === 'products') {
+          this.parentCategory = undefined; // clean previous data
+          this.subcategories = undefined;
+          if (url.length > 2) {
+            this.category = url[2];
+            this.loadProducts({category: this.category, productsPerPage: this.paginators ? this.paginators._results[0].rows : 12});
+            this.categoriesService.getParent(this.category).then(value => {
+              if (value) {
+                this.parentCategory = value;
+              } else {
+                this.parentCategory = new Category('/products', null, 'Wszystkie produkty');
+              }
+            });
+            this.categoriesService.getChildren(this.category).then((value: Category[]) => {
+              this.subcategories = [];
+              value.forEach(value1 => {
+                this.subcategories.push({label: value1.name, value: value1.id});
+              });
+            });
+          } else {
+            this.category = undefined;
+            this.loadProducts({productsPerPage: this.paginators ? this.paginators._results[0].rows : 12});
+            this.categoriesService.getBaseCategories().then((value: Category[]) => {
+              this.subcategories = [];
+              value.forEach(value1 => {
+                this.subcategories.push({label: value1.name, value: value1.id});
+              });
+            });
+          }
+        } else {
+          subscription.unsubscribe();
         }
       }
     });
   }
 
   loadProducts(params) {
+    if (this.nameFilter) {
+      params.name = this.nameFilter;
+    }
+    if (this.rangeValues[0]) {
+      params.minPrice = this.rangeValues[0];
+    }
+    if (this.rangeValues[1]) {
+      params.maxPrice = this.rangeValues[1];
+    }
     this.loadProductsService.getProducts(params).subscribe(next => {
       this.products = next.content;
       this.totalRecords = next.totalElements;
@@ -61,21 +108,42 @@ export class ProductListComponent implements OnInit {
     $('.price').css('fontSize', `${width / 10}px`);
   }
 
-  checkHasProperNumber(newValue: string) {
-      if ( newValue !== '' && !newValue.match('^[0-9]+\.{0,1}[0-9]{0,2}$')) {
-        // this.toastService.error('Cena powinna być liczbą dodatnią, maksymalnie dwa miejsca po przecinku');
-        return false;
-      }
-  }
-
   changePage(event: any) {
-    this.loadProducts({pageNumber: event.page, category: this.category, productsPerPage: this.rowNumber});
-    for (const paginator of (this.paginators._results as Paginator[])) {
-      paginator.rows = event.rows;
-      if (paginator.getPage() !== event.page) {
-        paginator.changePage(event.page);
+    if (this.recursive) {
+      this.recursive = false;
+    } else {
+      this.page = event.page;
+      this.rows = event.rows;
+      this.applySortOrFilter();
+      for (const paginator of (this.paginators._results as Paginator[])) {
+        paginator.rows = event.rows;
+        if (paginator.getPage() !== event.page) {
+          this.recursive = true;
+          paginator.changePage(event.page);
+        }
       }
     }
+  }
+
+  showDetails(event: any) {
+    this.productToDetails = event.product;
+    this.photoToDetails = event.photo;
+    this.displayDetails = true;
+  }
+
+  changeName(event: Event) {
+    this.nameFilter = (event.target as HTMLInputElement).value;
+  }
+
+  applySortOrFilter() {
+    const params: any = {
+      pageNumber: this.page ? this.page : 0,
+      productsPerPage: this.rows ? this.rows : 12,
+      sortingMethod: this.sortSelected ? this.sortSelected : '' };
+    if (this.category) {
+      params.category = this.category;
+    }
+    this.loadProducts(params);
   }
 }
 

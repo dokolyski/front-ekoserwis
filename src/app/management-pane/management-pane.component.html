@@ -1,9 +1,11 @@
-<div style="padding: 30px; margin-top: auto">
-  <div class="p-grid object">
-    <div class="p-col-12 p-md-3" style="margin-right: 20px">
-      <p-menu [model]="items"></p-menu>
+<div class="whole-pane">
+  <div class="p-grid">
+    <div class="p-col-12 p-md-4">
+      <div class="object" style="margin-right: 20px">
+        <p-menu [style]="{width: '100%'}" [model]="items"></p-menu>
+      </div>
     </div>
-    <div class="p-col-12 p-md-8">
+    <div class="p-col-12 p-md-7">
       <router-outlet></router-outlet>
     </div>
   </div>

@@ -1,1 +1,10 @@
-<p>categories-management works!</p>
+<div class="object">
+  <p-tree [filter]="true" [value]="categoriesTree" selectionMode="single" (onNodeExpand)="categoriesTreeService.addInputNodes($event)" (onNodeCollapse)="categoriesTreeService.removeInputNodes($event)">
+    <ng-template let-node pTemplate="default">
+      <input style="width: 65%" [(ngModel)]="node.label" type="text" class="ui-inputtext">
+      <button *ngIf="node.key" (click)="editCategory(node)" icon="pi pi-pencil" pButton type="button" class="ui-button-warning" pTooltip="Zmień nazwę" tooltipPosition="top"></button>
+      <button *ngIf="node.key" (click)="removeCategory(node)" icon="pi pi-times" pButton type="button" class="ui-button-danger" pTooltip="Usuń" tooltipPosition="top"></button>
+      <button *ngIf="!node.key && (!node.parent || node.parent.key)" (click)="addCategory(node)" icon="pi pi-plus" pButton type="button" class="ui-button-success" pTooltip="Utwórz" tooltipPosition="top"></button>
+    </ng-template>
+  </p-tree>
+</div>

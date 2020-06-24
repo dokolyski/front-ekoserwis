@@ -4,6 +4,7 @@ import {Observable} from 'rxjs';
 import {Product} from '../models/Product';
 import {Page} from '../models/Page';
 import {UserService} from './user.service';
+import {Unit} from '../models/Unit';
 @Injectable({
   providedIn: 'root'})
 export class LoadProductsService {
@@ -12,10 +13,22 @@ export class LoadProductsService {
 
   getProducts(params?): Observable<Page<Product>> {
     return new Observable<Page<Product>>(subscriber => {
-      this.http.get('/products/get', {params, headers: {Authorization: this.userService.getJWT()}}).subscribe((data: Page<Product>) => {
+      this.http.get('/products/get', {params}).subscribe((data: Page<Product>) => {
         subscriber.next(data);
       });
     });
+  }
+
+  getDetailedProduct(id: string): Promise<Product> {
+      return this.http.get<Product>('/products/details', {params: {id}}).toPromise();
+  }
+
+  getUnit(id: string): Promise<Unit> {
+    return this.http.get<Unit>('/unit/get', {params: {id}}).toPromise();
+  }
+
+  getAllUnits(): Promise<Unit[]> {
+    return this.http.get<Unit[]>('/unit/getAll').toPromise();
   }
 
   getPhotos(ids: string[]): Observable<any> {

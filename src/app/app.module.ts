@@ -11,16 +11,17 @@ import {ButtonModule} from 'primeng/button';
 import {InputTextModule} from 'primeng/inputtext';
 import { UploadTemplateComponent } from './management-pane/upload-template/upload-template.component';
 import {
-  DialogModule,
-  FileUploadModule,
-  FullCalendarModule, GalleriaModule,
-  InputTextareaModule, MenuModule, MessageModule, OrderListModule, PaginatorModule, PanelMenuModule,
-  RadioButtonModule, ScrollPanelModule, SidebarModule,
-  TreeModule
+    ConfirmDialogModule,
+    DialogModule,
+    FileUploadModule,
+    FullCalendarModule, GalleriaModule,
+    InputTextareaModule, ListboxModule, MenuModule, MessageModule, OrderListModule, PaginatorModule, PanelMenuModule,
+    RadioButtonModule, ScrollPanelModule, SidebarModule, TableModule, TooltipModule,
+    TreeModule
 } from 'primeng';
 import {MessageService} from 'primeng/api';
 import {ToastModule} from 'primeng/toast';
-import { HttpClientModule } from '@angular/common/http';
+import {HTTP_INTERCEPTORS, HttpClientModule} from '@angular/common/http';
 import {FormsModule} from '@angular/forms';
 import {UploadProductService} from './shared/services/upload-product.service';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -32,12 +33,13 @@ import { ProductDetailsComponent } from './product-details/product-details.compo
 import { ImageOrderComponent } from './management-pane/upload-template/image-order/image-order.component';
 import {CookieService} from 'ngx-cookie-service';
 import { ContactComponent } from './contact/contact.component';
-import { ProfileComponent } from './profile/profile.component';
-import { ShoppingCardComponent } from './shopping-card/shopping-card.component';
-import { LoginComponent } from './profile/login/login.component';
-import { ProfileDetailsComponent } from './profile/profile-details/profile-details.component';
-import { OrderDetailsComponent } from './profile/profile-details/order-details/order-details.component';
-import { ChangePasswordComponent } from './profile/change-password/change-password.component';
+import { LoginComponent } from './login/login.component';
+import { ProfileDetailsComponent } from './profile-details/profile-details.component';
+import { OrderDetailsComponent } from './profile-details/order-details/order-details.component';
+import { ShoppingListComponent } from './shopping-list/shopping-list.component';
+import {Interceptor} from './shared/services/interceptor';
+import { WarehouseManagementComponent } from './management-pane/warehouse-management/warehouse-management.component';
+import { EditProductsComponent } from './management-pane/edit-products/edit-products.component';
 
 @NgModule({
   declarations: [
@@ -52,44 +54,53 @@ import { ChangePasswordComponent } from './profile/change-password/change-passwo
     ProductDetailsComponent,
     ImageOrderComponent,
     ContactComponent,
-    ProfileComponent,
-    ShoppingCardComponent,
     LoginComponent,
     ProfileDetailsComponent,
     OrderDetailsComponent,
-    ChangePasswordComponent,
+    ShoppingListComponent,
+    WarehouseManagementComponent,
+    EditProductsComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    MenubarModule,
-    InputTextModule,
-    ButtonModule,
-    InputTextareaModule,
-    FullCalendarModule,
-    FileUploadModule,
-    HttpClientModule,
-    FormsModule,
-    RadioButtonModule,
-    TreeModule,
-    ToastModule,
-    BrowserAnimationsModule,
-    PanelMenuModule,
-    MenuModule,
-    PaginatorModule,
-    InputNumberModule,
-    MessageModule,
-    SidebarModule,
-    OrderListModule,
-    DialogModule,
-    ScrollPanelModule,
-    GalleriaModule
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        MenubarModule,
+        InputTextModule,
+        ButtonModule,
+        InputTextareaModule,
+        FullCalendarModule,
+        FileUploadModule,
+        HttpClientModule,
+        FormsModule,
+        RadioButtonModule,
+        TreeModule,
+        ToastModule,
+        BrowserAnimationsModule,
+        PanelMenuModule,
+        MenuModule,
+        PaginatorModule,
+        InputNumberModule,
+        MessageModule,
+        SidebarModule,
+        OrderListModule,
+        DialogModule,
+        ScrollPanelModule,
+        GalleriaModule,
+        ConfirmDialogModule,
+        TableModule,
+        ListboxModule,
+        TooltipModule
+    ],
   providers: [
     MessageService,
     UploadProductService,
-    CookieService
+    CookieService,
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: Interceptor,
+      multi: true
+    }
 ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
 })
 export class AppModule { }

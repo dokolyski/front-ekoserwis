@@ -1,12 +1,14 @@
 export class Order {
   id?: string;
-  userId: string;
-  positions: {
-    productId: string;
+  userId?: string;
+  positions?: {
+    productName: string;
     amount: number;
   }[];
+  orderDate: string;
+  amount: number;
   status: string;
-  customerData: {
+  customerData?: {
     firstName: string;
     lastName: string;
     address: string;

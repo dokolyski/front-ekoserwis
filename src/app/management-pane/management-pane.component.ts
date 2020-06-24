@@ -8,9 +8,10 @@ import {MenuItem} from 'primeng';
 })
 export class ManagementPaneComponent implements OnInit {
   items: MenuItem[] = [
+    {label: 'Edytuj zawartość magazynu', routerLink: ['storedProducts']},
     {label: 'Dodaj produkt', routerLink: ['upload']},
+    {label: 'Edytuj produkty', routerLink: ['edit']},
     {label: 'Zarządzaj kategoriami', routerLink: ['categories']},
-    {label: 'Edytuj zawartość magazynu', routerLink: ['storedProducts']}
   ];
 
   constructor() { }

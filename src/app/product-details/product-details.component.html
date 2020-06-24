@@ -1,26 +1,49 @@
-<p-scrollPanel [style]="{width: '100%', height: 'calc(100% - 18px)'}">
-  <p-galleria #galleria [value]="photos" [(activeIndex)]="activeIndex" [numVisible]="5" [containerStyle]="{'max-width':'640px'}" [containerClass]="galleriaClass()" [showThumbnails]="showThumbnails"
-              [showItemNavigators]="true" [showItemNavigatorsOnHover]="true" [circular]="true">
-    <ng-template pTemplate="item" let-item>
-      <img src="data:image/jpeg;base64,{{item}}" [ngStyle]="{'width': !fullscreen ? '100%' : '', 'display': !fullscreen ? 'block' : ''}" />
-    </ng-template>
-    <ng-template pTemplate="thumbnail" let-item>
-      <div class="p-grid p-nogutter p-justify-center">
-        <img src="data:image/jpeg;base64,{{item}}" />
+<p-scrollPanel [style]="{width: '100%', height: 'calc(100% - 17px)'}">
+  <div *ngIf="product !== undefined" class="p-grid">
+    <div class="productName-details p-col-12">{{product.name}}</div>
+    <div *ngIf="i !== undefined && photos !== undefined" class="gallery">
+      <div class="frame">
+        <div class="gallery-series">{{(i + 1) + '/' +  photos.length}}</div>
+        <img class="big-image" src="data:image/jpeg;base64,{{photos[i]}}" (click)="photoClicked($event)"/>
       </div>
-    </ng-template>
-    <ng-template pTemplate="footer" let-item>
-      <div class="custom-galleria-footer">
-        <button pButton icon="pi pi-list" (click)="onThumbnailButtonClick()"></button>
-        <span *ngIf="photos"  class="title-container">
-            <span>{{activeIndex + 1}}/{{photos.length}}</span>
-        </span>
-        <button pButton [icon]="fullScreenIcon()" (click)="toggleFullScreen()" class="fullscreen-button"></button>
+      <div class="p-grid p-justify-even p-align-center">
+        <div class="p-col-1">
+          <p-button [disabled]="i === 0" (onClick)="changeImg(-1)" label="" icon="pi pi-angle-left"></p-button>
+        </div>
+        <div class="p-col-2">
+          <img class="miniature" *ngIf="photos[i-1] !== undefined" src="data:image/jpeg;base64,{{photos[i-1]}}" (click)="i = i - 1"/>
+        </div>
+        <div class="p-col-2">
+          <img class="miniature" *ngIf="photos[i] !== undefined" src="data:image/jpeg;base64,{{photos[i]}}"/>
+        </div>
+        <div class="p-col-2">
+          <img class="miniature" *ngIf="photos[i+1] !== undefined" src="data:image/jpeg;base64,{{photos[i+1]}}" (click)="i = i + 1"/>
+        </div>
+        <div class="p-col-2">
+          <p-button [disabled]="i === photos.length - 1" (onClick)="changeImg(1)" label="" icon="pi pi-angle-right"></p-button>
+        </div>
       </div>
-    </ng-template>
-  </p-galleria>
-
-  <div class="price">{{product.price}} zł</div>
-<div class="productName">{{product.name}}</div>
-<div class="description">{{product.description}}</div>
+    </div>
+    <div class="short_info p-col-12">
+        <div class="price-details">{{product.price}} zł <span *ngIf="unit">/ {{unit.name}}</span></div>
+        <button (click)="addProductToCart()" icon="pi pi-plus" [disabled]="product.itemsNumber === 0" pButton type="button" label="Dodaj do koszyka" class="ui-button-success"></button>
+        <div class="dimensions-details" *ngIf="product.dimensions">Wymiary: {{product.dimensions}}</div>
+        <div class="weight-details" *ngIf="product.weight">Waga: {{product.weight}}</div>
+        <div [ngStyle]="{'color': product.itemsNumber > 0 ? '#07b61a' : 'red'}" class="number-details">Ilość dostępna w magazynie: {{product.itemsNumber}}</div>
+      <p class="shortDescription-details" *ngIf="product.shortDescription">Krótki opis: {{product.shortDescription}}</p>
+      <span style="cursor: pointer;" (click)="scrollToFullDescription()"><i class="pi pi-arrow-down"></i> przewiń do pełnego opisu</span>
+    </div>
+    <div *ngIf="product.description" class="description-details p-col-12">
+      <p class="fullDescription-details" *ngIf="product.description">{{product.description}}</p>
+    </div>
+  </div>
 </p-scrollPanel>
+<p-dialog header="Podaj ilość" [(visible)]="display" [draggable]="false" [resizable]="false">
+  <p-inputNumber [useGrouping]="false" [minFractionDigits]="2" [(ngModel)]="amount" mode="decimal"></p-inputNumber>
+  <p-footer>
+    <button type="button" (click)="cancel()" pButton label="Anuluj"></button>
+    <button type="button" (click)="accept()" pButton label="Dodaj do koszyka"></button>
+  </p-footer>
+</p-dialog>
+
+

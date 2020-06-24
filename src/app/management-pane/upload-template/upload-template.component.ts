@@ -1,117 +1,90 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, ViewChild} from '@angular/core';
 import {ToastService} from '../../shared/services/toast.service';
 import {UploadProductService} from '../../shared/services/upload-product.service';
-import {FileUpload, TreeNode} from 'primeng';
+import {FileUpload, SelectItem, TreeNode} from 'primeng';
 import {CategoriesService} from '../../shared/services/categories.service';
 import {Observable} from 'rxjs';
 import {Category} from '../../shared/models/Category';
 import {Product} from '../../shared/models/Product';
 import {MenuItem} from 'primeng/api';
+import {LoadProductsService} from '../../shared/services/load-products.service';
+import {Unit} from '../../shared/models/Unit';
+import {Router} from '@angular/router';
+import {CategoriesTreeService} from '../../shared/services/categories-tree.service';
 
 @Component({
   selector: 'app-upload-template',
   templateUrl: './upload-template.component.html',
   styleUrls: ['./upload-template.component.scss'],
 })
-export class UploadTemplateComponent implements OnInit {
+export class UploadTemplateComponent implements OnInit, OnChanges {
   @ViewChild('fileUpload', {static: false, read: false} ) private fileUpload: FileUpload;
+
+  @Input() inputProduct: Product;
+  @Input() edit: boolean;
 
   categoriesTree: TreeNode[] = [];
   selectedCategory: TreeNode;
-  productName: string;
-  price = '0';
-  itemsNumber = '1';
-  unit = 'szt.';
-  shortDescription: string;
-  description: string;
-  dimensions: string;
-  weight: string;
   displayImagesOrder = false;
   photosIDs: string[] = [];
   product: Product;
+  units: Unit[];
+  selectedUnit: Unit;
+  categoriesTreeService: CategoriesTreeService;
 
-  // tslint:disable-next-line:max-line-length
-  constructor(private toastService: ToastService, private uploadService: UploadProductService, private categoriesService: CategoriesService) {}
+
+  constructor(private toastService: ToastService,
+              private uploadService: UploadProductService,
+              private categoriesService: CategoriesService,
+              private loadProductsService: LoadProductsService,
+              private router: Router) {}
 
   ngOnInit() {
-    const categories: Promise<Category[]> = this.categoriesService.getCategories();
-    console.log('init');
-    categories.then(data => {
-      this.createCategoriesTree(data);
-    });
-    categories.catch(() =>  this.toastService.error('Nie udało się załadować kategorii'));
-    categories.finally(() => {
-      this.categoriesTree.push({styleClass: 'inputNode', children: []});
-      this.insertInputChildren();
-    });
-  }
-
-  private insertInputChildren() {
-    this.categoriesTree.forEach(node => node.children.push({styleClass: 'inputNode', children: []}));
-  }
-
-  private createCategoriesTree(categories: Category[]) {
-    while (categories.length > 0) {
-      for ( let i = 0; i < categories.length; i++ ) {
-        if (this.addCategory(categories[i])) {
-          categories.splice(i, 1);
-          i--;
-        }
+    this.categoriesTreeService = new CategoriesTreeService(this.toastService, this.categoriesService);
+    this.categoriesTreeService.getDataAndFormat().then(data => {
+      this.categoriesTree = data;
+      if (this.inputProduct) {
+        this.selectedCategory = this.findInTree(this.inputProduct.category, this.categoriesTree);
       }
-    }
-  }
-
-  private hasCategory(elements: TreeNode[], parentID: string): TreeNode {
-    for (const item of elements) {
-      if (item.key === parentID) {
-        return item;
-      } else {
-        if (item.children !== undefined) {
-          const returnedElement: MenuItem = this.hasCategory(item.children, parentID);
-          if (returnedElement !== undefined) {
-            return returnedElement;
-          }
-        }
+    });
+    this.loadProductsService.getAllUnits().then(value => {
+      value.sort((a, b) => a.name <= b.name ? -1 : 1);
+      this.units = value;
+      if (this.inputProduct) {
+        this.selectedUnit = this.units.find(value1 => this.inputProduct.unitId === value1.id);
       }
-    }
-  }
-
-  private addCategory(cat: Category): boolean {
-    let newItem: TreeNode;
-    if (cat.parentId === null) {
-      newItem = {label: cat.name, children: [], key: cat.id};
-      this.categoriesTree.push(newItem);
-      return true;
-    }
-    const parentItem: TreeNode = this.hasCategory(this.categoriesTree, cat.parentId);
-    if (parentItem !== undefined) {
-      newItem = {label: cat.name, children: [], key: cat.id};
-      parentItem.children.push(newItem);
-      return true;
-    }
-    return  false;
-  }
-
-  addInputNodes(event) {
-    event.node.children.forEach((child: TreeNode) => {
-      child.children.push({styleClass: 'inputNode', children: []});
-    });
-  }
-
-  removeInputNodes(event: any) {
-    event.node.children.forEach((child: TreeNode) => {
-      this.removeInputNodesRecursively(child);
-    });
-  }
-
-  private removeInputNodesRecursively(node: TreeNode) {
-    if (node.expanded === true) {
-      node.children.forEach((child: TreeNode) => {
-        this.removeInputNodesRecursively(child);
       });
-      node.expanded = false;
+    this.inputProduct = {category: '', images: [], itemsNumber: 0, name: '', price: 0, unitId: ''};
+  }
+
+  ngOnChanges(): void {
+    if (this.inputProduct) {
+      this.selectedCategory = this.findInTree(this.inputProduct.category, this.categoriesTree);
+      this.selectedUnit = this.units[this.units.findIndex(value1 => this.inputProduct.unitId === value1.id)];
+    } else {
+      this.inputProduct = {category: '', images: [], itemsNumber: 0, name: '', price: 0, unitId: ''};
     }
-    node.children.pop();
+  }
+
+  private findInTree(id: string, nodes: TreeNode[]): TreeNode {
+    for (const node of nodes) {
+      console.log(node.key);
+      if (node.key === id) {
+        if (node.parent) {
+          node.parent.expanded = true;
+        }
+        return node;
+      } else if (node.children) {
+        const result = this.findInTree(id, node.children);
+        if (result) {
+          if (node.parent) {
+            node.parent.expanded = true;
+          }
+          node.expanded = true;
+          return result;
+        }
+      }
+    }
   }
 
   private errorCategoryWasDeleted(reason: string) {
@@ -123,31 +96,30 @@ export class UploadTemplateComponent implements OnInit {
       if (node.styleClass === undefined) {
         resolve(node.key);
       } else if (node.parent === undefined) {
-        this.uploadService.addNewCategory(node.label).then(data => resolve(data)).catch(reason => reject(reason));
+        this.categoriesService.addNewCategory(node.label).then(data => resolve(data)).catch(reason => reject(reason));
       } else {
         this.uploadCategories(node.parent).then(data => {
-          this.uploadService.addNewCategory(node.label, data).then(data2 => resolve(data2)).catch(reason => reject(reason));
+          this.categoriesService.addNewCategory(node.label, data).then(data2 => resolve(data2)).catch(reason => reject(reason));
         }).catch(reason => reject(reason));
       }
     });
   }
 
-  uploadProduct($event: any) {
+  uploadProduct(event: any) {
     if (this.checkDataCorrectness()) {
+      this.inputProduct.unitId = this.selectedUnit.id;
       const categoriesPromise = this.uploadCategories(this.selectedCategory).then(next => {
-        const categoryID = next;
+        this.inputProduct.category = next;
         this.photosIDs = [];
-        // tslint:disable-next-line:max-line-length
-        const completedProduct = new Product(this.productName, parseFloat(this.price), this.description, [], parseFloat(this.itemsNumber), this.dimensions, this.weight, categoryID);
         if (this.fileUpload._files.length > 0) {
           this.uploadAllPhotos().subscribe(newID => this.photosIDs.push(newID),
             () => {},
             () => {
-              completedProduct.images = this.photosIDs;
-              this.uploadWholeProduct(completedProduct);
+              this.inputProduct.images = this.photosIDs;
+              this.uploadWholeProduct(this.inputProduct);
             });
         } else {
-          this.uploadWholeProduct(completedProduct);
+          this.uploadWholeProduct(this.inputProduct);
         }
       });
       categoriesPromise.catch(reason => this.errorCategoryWasDeleted(reason));
@@ -157,9 +129,11 @@ export class UploadTemplateComponent implements OnInit {
   private uploadWholeProduct(product: Product): void {
     this.uploadService.uploadProduct(product).subscribe(next => {
       this.toastService.success('Zapisano');
-      if (next.images !== undefined) {
+      if (next.images.length > 1) {
         this.product = next;
         this.displayImagesOrder = true;
+      } else {
+        this.goBackToManagement();
       }
     });
   }
@@ -180,7 +154,7 @@ export class UploadTemplateComponent implements OnInit {
   }
 
   private checkDataCorrectness(): boolean {
-    if (this.productName === undefined || this.productName.length < 3) {
+    if (this.inputProduct.name === undefined || this.inputProduct.name.length < 3) {
       this.toastService.error('Zbyt krótka nazwa produktu (co najmniej 3 znaki)');
       return false;
     }
@@ -200,12 +174,28 @@ export class UploadTemplateComponent implements OnInit {
       return false;
     }
 
-    if ( this.price === undefined || !this.price.match('^[0-9]+\.{0,1}[0-9]{0,2}$') || parseFloat(this.price) === 0) {
-      this.toastService.error('Cena powinna być liczbą dodatnią, maksymalnie dwa miejsca po przecinku');
+    if ( this.inputProduct.price === undefined || this.inputProduct.price <= 0) {
+      this.toastService.error('Cena powinna być liczbą dodatnią');
       return false;
     }
-    if (this.itemsNumber === undefined || !this.itemsNumber.match('^[0-9]+\.*[0-9]*$')) {
-      this.toastService.error('Dostępna ilość powinna być liczbą nieujemną');
+
+    if (this.selectedUnit === undefined) {
+      this.toastService.error('Nie wybrano jednostki');
+      return false;
+    }
+
+    if (this.inputProduct.itemsNumber === undefined || this.inputProduct.itemsNumber <= 0) {
+      this.toastService.error('Dostępna ilość powinna być liczbą dodatnią');
+      return false;
+    }
+
+    if (this.selectedUnit.isInteger && !Number.isInteger(this.inputProduct.itemsNumber)) {
+      this.toastService.error('Dla wybranej jednostki ilość powinna być liczbą całkowitą');
+      return false;
+    }
+
+    if (!this.fileUpload._files.length) {
+      this.toastService.error('Produkt powinno reprezentować conajmniej jedno zdjęcie');
       return false;
     }
     return true;
@@ -213,6 +203,10 @@ export class UploadTemplateComponent implements OnInit {
 
   orderChanged() {
     this.displayImagesOrder = false;
-    // todo przejdź do listy produktów
+    this.goBackToManagement();
+  }
+
+  private goBackToManagement() {
+    this.router.navigate(['management']);
   }
 }

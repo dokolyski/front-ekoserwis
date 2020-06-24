@@ -17,10 +17,12 @@ img {
 
 .productName {
   font-weight: bold;
+  font-family: serif;
 }
 
 .description {
-  font-weight: lighter;
+  font-weight: 300;
+  text-align: center;
 }
 
 .price {

@@ -1,4 +1,4 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output} from '@angular/core';
+import {Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges} from '@angular/core';
 import {LoadProductsService} from '../../../shared/services/load-products.service';
 import {Product} from '../../../shared/models/Product';
 import {UploadProductService} from '../../../shared/services/upload-product.service';
@@ -10,7 +10,7 @@ import {UploadProductService} from '../../../shared/services/upload-product.serv
 })
 export class ImageOrderComponent implements OnInit, OnChanges {
   @Input() product: Product;
-  @Output() end = new EventEmitter<void>();
+  @Output() endOrder = new EventEmitter<void>();
   photos: any[] = [];
 
   constructor(private loadProductsService: LoadProductsService, private uploadProductService: UploadProductService) {}
@@ -18,14 +18,17 @@ export class ImageOrderComponent implements OnInit, OnChanges {
   ngOnInit() {}
 
   confirmOrder() {
-    this.uploadProductService.actualizeProduct(this.product).subscribe(next => {
-      this.end.emit();
+    this.product.images = Array.from(this.photos, x => x.id);
+    this.uploadProductService.uploadProduct(this.product).subscribe(next => {
+      this.endOrder.emit();
     });
   }
 
   ngOnChanges() {
-    this.loadProductsService.getPhotos(this.product.images).subscribe(next => {
-      this.photos.push(next.image);
-    });
+    if (this.product) {
+      this.loadProductsService.getPhotos(this.product.images).subscribe(next => {
+        this.photos.push(next);
+      });
+    }
   }
 }

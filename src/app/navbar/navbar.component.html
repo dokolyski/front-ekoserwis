@@ -1,2 +1,5 @@
 <p-menubar [model]="items">
 </p-menubar>
+<p-sidebar [(visible)]="displayShoppingCard" position="right">
+  <app-shopping-list (hide)="displayShoppingCard = false;" [show]="displayShoppingCard"></app-shopping-list>
+</p-sidebar>

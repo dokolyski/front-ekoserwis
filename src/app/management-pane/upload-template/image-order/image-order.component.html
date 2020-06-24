@@ -1,10 +1,10 @@
-<p-scrollPanel [style]="{width: '100%', height: '100%'}">
+<p-scrollPanel *ngIf="product" [style]="{width: '100%', height: '100%'}">
   <p-orderList header="Wybierz kolejność zdjęć.
            Zwróć szczególną uwagę na zdjęcie na pierwszej pozycji - będzie to zdjęcie główne tego produktu."
                [value]="photos" dragdrop="true"   [dragdrop]="true" [responsive]="true">
     <ng-template let-photo pTemplate="item">
       <div class="ui-helper-clearfix">
-        <img src="data:image/jpeg;base64,{{photo.data}}" style="display:inline-block;margin:2px 0 2px 2px" width="100px">
+        <img src="data:image/jpeg;base64,{{photo.image.data}}" style="display:inline-block;margin:2px 0 2px 2px" width="100px">
       </div>
     </ng-template>
   </p-orderList>

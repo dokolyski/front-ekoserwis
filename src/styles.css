@@ -10,6 +10,17 @@ html {
 .object {
   background-color: antiquewhite;
   border-radius: 20px;
+  margin: 20px;
+  padding: 20px;
+}
+
+.whole-pane {
+  margin-top: auto;
+  padding: 20px;
+}
+
+* {
+  font-family: sans-serif;
 }
 
 /*# sourceMappingURL=styles.css.map */

@@ -8,7 +8,7 @@ export class UserService {
   constructor(private http: HttpClient) { }
 
   register(email: string, password: string) {
-    return this.http.post('/user/register', {email, password}).toPromise();
+    return this.http.post('/user/register', {email, password}, {responseType: 'json', observe: 'response'}).toPromise();
   }
 
   login(email: string, password: string) {
@@ -16,11 +16,11 @@ export class UserService {
   }
 
   logout() {
-    localStorage.removeItem('jwt');
+    localStorage.clear();
   }
 
   getProfile() {
-    return this.http.get('/user/profile', {headers: {Authorization: this.getJWT()}}).toPromise();
+    return this.http.get('/user/profile', {responseType: 'json', observe: 'response'}).toPromise();
   }
 
   setJWT(jwt: string) {

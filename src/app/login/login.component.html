@@ -1,4 +1,4 @@
-<div class="whole-login">
+<div class="whole-pane">
   <div class="object p-grid">
     <div class="p-col-12 p-sm-4">
       <div class="p-grid">
@@ -12,11 +12,11 @@
       <label for="email">E-mail</label>
     </span>
       <span class="ui-float-label form-field">
-      <input [(ngModel)]="password" id="password" type="text" pInputText>
+      <input [(ngModel)]="password" id="password" type="password" pInputText>
       <label for="password">Hasło</label>
     </span>
       <span *ngIf="type === 'r'" class="ui-float-label form-field">
-      <input [(ngModel)]="repeatPassword" id="repeat-password" type="text" pInputText>
+      <input [(ngModel)]="repeatPassword" id="repeat-password" type="password" pInputText>
       <label for="repeat-password">Powtórz hasło</label>
     </span>
       <div style="text-align: center">

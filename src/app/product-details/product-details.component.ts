@@ -1,115 +1,114 @@
-import {Component, Input, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {Component, Input, OnChanges, OnInit, SimpleChanges} from '@angular/core';
 import {Product} from '../shared/models/Product';
-import {Galleria} from 'primeng';
+import {LoadProductsService} from '../shared/services/load-products.service';
+import {Unit} from '../shared/models/Unit';
+import {ShoppingCartService} from '../shared/services/shopping-cart.service';
+import {ToastService} from '../shared/services/toast.service';
 
 @Component({
   selector: 'app-product-details',
   templateUrl: './product-details.component.html',
   styleUrls: ['./product-details.component.scss']
 })
-export class ProductDetailsComponent implements OnInit, OnDestroy {
-  @Input() readonly product: Product;
-  @Input() readonly photos: any[];
+export class ProductDetailsComponent implements OnInit, OnChanges {
+  @Input() product: Product;
+  photos: any[];
+  i: number;
+  unit: Unit;
+  amount: number;
+  display: boolean;
 
-  showThumbnails: boolean;
+  constructor(private loadProductsService: LoadProductsService,
+              public shoppingCartService: ShoppingCartService,
+              private toastService: ToastService) { }
 
-  fullscreen = false;
+  ngOnInit(): void {}
 
-  activeIndex = 0;
-
-  onFullScreenListener: any;
-
-  @ViewChild('galleria', {static: false}) galleria: Galleria;
-
-
-  constructor() { }
-
-  responsiveOptions: any[] = [
-    {
-      breakpoint: '1024px',
-      numVisible: 5
-    },
-    {
-      breakpoint: '768px',
-      numVisible: 3
-    },
-    {
-      breakpoint: '560px',
-      numVisible: 1
+  ngOnChanges(changes: SimpleChanges): void {
+    this.display = false;
+    if (this.product !== undefined) {
+      if (changes.product.previousValue === undefined || changes.product.previousValue.id !== this.product.id) {
+        this.i = 0;
+        this.loadProductsService.getDetailedProduct(this.product.id).then(value => {
+          this.product = value;
+        });
+        this.photos = new Array(this.product.images.length);
+        this.loadProductsService.getPhotos(this.product.images).subscribe(next => {
+          this.photos[this.product.images.indexOf(next.id)] = next.image.data;
+        });
+        console.log(this.product.unitId);
+        if (this.product.unitId) {
+          console.log(this.product.unitId);
+          this.loadProductsService.getUnit(this.product.unitId).then(value => {
+            console.log(value.name);
+            this.unit = value;
+          });
+        }
+      }
     }
-  ];
-  ngOnInit() {
   }
 
-  onThumbnailButtonClick() {
-    this.showThumbnails = !this.showThumbnails;
+  changeImg(n: number) {
+    this.i += n;
   }
 
-  toggleFullScreen() {
-    if (this.fullscreen) {
-      this.closePreviewFullScreen();
+  photoClicked(event: MouseEvent) {
+    const clickableWidth = 80;
+    if (event.offsetX < clickableWidth) {
+      if (this.i > 0) {
+        this.i--;
+      }
+    } else if (event.offsetX > ( parseFloat($('.big-image').css('width')) - clickableWidth)) {
+      if (this.i < this.photos.length - 1) {
+        this.i++;
+      }
+    }
+  }
+
+  scrollToFullDescription() {
+    $('.fullDescription-details').get()[0].scrollIntoView({behavior: 'smooth'});
+  }
+
+  addProductToCart() {
+    if (this.unit.isInteger) {
+      const addItem = this.shoppingCartService.addProduct(this.product, 1);
+      if (addItem) {
+        this.addItemOK(addItem);
+      } else {
+        this.addItemWrong();
+      }
     } else {
-      this.openPreviewFullScreen();
+      this.amount = 1;
+      this.display = true;
     }
   }
 
-  openPreviewFullScreen() {
-    const elem = this.galleria.element.nativeElement.querySelector(".ui-galleria");
-    if (elem.requestFullscreen) {
-      elem.requestFullscreen();
-    }
-    else if (elem['mozRequestFullScreen']) { /* Firefox */
-      elem['mozRequestFullScreen']();
-    }
-    else if (elem['webkitRequestFullscreen']) { /* Chrome, Safari & Opera */
-      elem['webkitRequestFullscreen']();
-    }
-    else if (elem['msRequestFullscreen']) { /* IE/Edge */
-      elem['msRequestFullscreen']();
-    }
+  cancel() {
+    this.toastService.info(`Anulowano dodanie produktu do koszyka`);
+    this.display = false;
   }
 
-  onFullScreenChange() {
-    this.fullscreen = !this.fullscreen;
-  }
-
-  closePreviewFullScreen() {
-    if (document.exitFullscreen) {
-      document.exitFullscreen();
-    } else if (document['mozCancelFullScreen']) {
-      document['mozCancelFullScreen']();
-    } else if (document['webkitExitFullscreen']) {
-      document['webkitExitFullscreen']();
-    } else if (document['msExitFullscreen']) {
-      document['msExitFullscreen']();
+  accept() {
+    if (this.amount > 0) {
+      const addItem = this.shoppingCartService.addProduct(this.product, this.amount);
+      if (addItem) {
+        this.addItemOK(addItem);
+        this.display = false;
+      } else {
+        this.addItemWrong();
+      }
+    } else {
+      this.toastService.warn(`Podana ilość (${this.product.itemsNumber}) powinna być większa od zera`);
     }
   }
 
-  bindDocumentListeners() {
-    this.onFullScreenListener = this.onFullScreenChange.bind(this);
-    document.addEventListener("fullscreenchange", this.onFullScreenListener);
-    document.addEventListener("mozfullscreenchange", this.onFullScreenListener);
-    document.addEventListener("webkitfullscreenchange", this.onFullScreenListener);
-    document.addEventListener("msfullscreenchange", this.onFullScreenListener);
+  private addItemOK(amount: number) {
+    this.toastService.success(`Dodano produkt ${this.product.name}, w koszyku jest ${amount}${this.unit.name} tego produktu`);
   }
 
-  unbindDocumentListeners() {
-    document.removeEventListener("fullscreenchange", this.onFullScreenListener);
-    document.removeEventListener("mozfullscreenchange", this.onFullScreenListener);
-    document.removeEventListener("webkitfullscreenchange", this.onFullScreenListener);
-    document.removeEventListener("msfullscreenchange", this.onFullScreenListener);
-    this.onFullScreenListener = null;
-  }
-
-  ngOnDestroy() {
-    this.unbindDocumentListeners();
-  }
-
-  galleriaClass() {
-    return `custom-galleria ${this.fullscreen ? 'fullscreen' : ''}`;
-  }
-
-  fullScreenIcon() {
-    return `pi ${this.fullscreen ? 'pi-window-minimize' : 'pi-window-maximize'}`;
+  private addItemWrong() {
+    this.toastService.error(`Nie można dodać tego produktu, gdyż jego ilość w koszyku
+         przekroczyła by dostępną ilość (${this.product.itemsNumber}${this.unit.name}).
+         Wybierz mniejszą ilość, bądź skontaktuj się z nami aby osobiście ustalić możliwość sprzedaży tego produktu`);
   }
 }

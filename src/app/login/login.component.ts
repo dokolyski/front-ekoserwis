@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import {ToastService} from '../../shared/services/toast.service';
-import {UserService} from '../../shared/services/user.service';
+import {ToastService} from '../shared/services/toast.service';
+import {UserService} from '../shared/services/user.service';
 import {Router} from '@angular/router';
 
 @Component({
@@ -28,7 +28,7 @@ export class LoginComponent implements OnInit {
     this.userService.login(this.email, this.password).then( (response) => {
       this.userService.setJWT(response.headers.get('Authorization'));
       this.toastService.success('Zalogowano!');
-      this.router.navigate(['profile/details']);
+      this.router.navigate(['profile']);
     }).catch(reason => {
       this.toastService.error('Nieprawidłowy email lub hasło');
     });
@@ -39,7 +39,7 @@ export class LoginComponent implements OnInit {
       this.toastService.success(`Zarejestrowano!`);
       this.type = 'l';
     }).catch(reason => {
-      this.toastService.error(reason.error.message);
+      this.toastService.error(reason.error.message ? reason.error.message : 'Nie udało się zarejestrować');
     });
   }
 

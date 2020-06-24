@@ -21,6 +21,7 @@ export class NavbarComponent implements OnInit {
   };
 
   items: MenuItem[];
+  displayShoppingCard: boolean;
 
   ngOnInit() {
     const categories: Promise<Category[]> = this.categoriesService.getCategories();
@@ -29,6 +30,8 @@ export class NavbarComponent implements OnInit {
       this.createCategoriesTree(data);
     });
 
+    // todo check authentication and provide right options
+
     this.items = [
       this.productsItem,
       {label: 'Kontakt', routerLink: ['contact']},
@@ -36,7 +39,7 @@ export class NavbarComponent implements OnInit {
       {label: 'Zarządzaj asortymentem', routerLink: ['management']},
       {separator: true},
       {label: 'Mój profil', icon: 'pi pi-user', routerLink: ['profile']},
-      {label: 'Koszyk', icon: 'pi pi-shopping-cart', styleClass: 'cardIcon', routerLink: ['shoppingCard']}
+      {label: 'Koszyk', icon: 'pi pi-shopping-cart', styleClass: 'cardIcon', command: () => this.displayShoppingCard = true}
     ];
   }
 

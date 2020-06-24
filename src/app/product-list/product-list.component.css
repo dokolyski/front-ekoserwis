@@ -1,18 +1,9 @@
-.container {
-  padding: 20px;
-}
-
-.whole-list {
-  margin-top: auto;
-  padding: 20px;
-}
-
-.object {
-  padding: 20px;
-}
-
 ::ng-deep p-inputNumber * {
   width: 30%;
+}
+
+.filter-button {
+  height: 100%;
 }
 
 /*# sourceMappingURL=product-list.component.css.map */

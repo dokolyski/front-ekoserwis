@@ -9,15 +9,6 @@ import {ToastService} from './toast.service';
 export class UploadProductService {
   constructor(private http: HttpClient, private toastService: ToastService) { }
 
-  addNewCategory(name: string, parent?: string): Promise<string>  {
-      const formData = new FormData();
-      formData.append('name', name);
-      if (parent !== undefined) {
-        formData.append('parentId', parent);
-      }
-      return this.http.post('/categories/add', formData, { responseType: 'text'}).toPromise();
-  }
-
   uploadPhoto(file: File): Observable<string> {
     return new Observable<string>(subscriber => {
       const formData: FormData = new FormData();
@@ -35,17 +26,6 @@ export class UploadProductService {
   uploadProduct(product: Product): Observable<Product>  {
     return new Observable<Product>(subscriber => {
       this.http.post('/products/add', product).subscribe((data: Product) => {
-        subscriber.next(data);
-      }, error => {
-        this.toastService.error(error);
-      });
-    });
-  }
-
-  // todo test it!
-  actualizeProduct(product: Product): Observable<string>  {
-    return new Observable<any>(subscriber => {
-      this.http.put('/products/set', product, { responseType: 'text'}).subscribe(data => {
         subscriber.next(data);
       }, error => {
         this.toastService.error(error);
